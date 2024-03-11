@@ -4,7 +4,7 @@ from payagraph.containers import *
 from payagraph.keyboards import *
 from payagraph.tools import *
 from decouple import config
-from db.user import UserStates, Channel
+from models.user import UserStates, Channel
 from tools import manuwriter
 from typing import Union
 from tools.exceptions import *
@@ -16,13 +16,13 @@ logger = logging.getLogger(__name__)
 
 # read .env configs
 # You bot data
-VIP_BOT_TOKEN = config('VIP_BOT_TOKEN')
+BOT_TOKEN = config('BOT_TOKEN')
 HOST_URL = config('HOST_URL')
-BOT_USERNAME = config('VIP_BOT_USERNAME')
+BOT_USERNAME = config('BOT_USERNAME')
 
 # Read the text resource containing the multilanguage data for the bot texts, messages, commands and etc.
 # Also you can write your texts by hard coding but it will be hard implementing multilanguage texts that way,
-text_resources = manuwriter.load_json('vip_texts', 'resources')
+text_resources = manuwriter.load_json('texts', 'resources')
 
 def some_message_handler(bot: TelegramBot, message: TelegramMessage) -> Union[TelegramMessage, Keyboard|InlineKeyboard]:
     '''TODO: Write your handler'''
@@ -44,7 +44,7 @@ main_keyboard = {
     'fa': Keyboard(text_resources["keywords"]["some_message"]["fa"])
 }
 
-bot = TelegramBot(token=VIP_BOT_TOKEN, username=BOT_USERNAME, host_url=HOST_URL, text_resources=text_resources, _main_keyboard=main_keyboard)
+bot = TelegramBot(token=BOT_TOKEN, username=BOT_USERNAME, host_url=HOST_URL, text_resources=text_resources, _main_keyboard=main_keyboard)
 
 bot.add_state_handler(state=UserStates.SELECT_CHANNEL, handler=some_state_handler)
 bot.add_message_handler(message=bot.keyword('some_message_handler'), handler=some_message_handler)

@@ -1,4 +1,4 @@
-from db.vip_models import VIPAccount
+from models.user import User
 import json
 from enum import Enum
 from tools.mathematix import force_cast
@@ -51,7 +51,7 @@ class TelegramMessage:
         self.id: int = self.msg['message_id'] if 'message_id' in self.msg else None
         self.text: str =  self.msg['text']
 
-        self.by: VIPAccount = VIPAccount.Get(self.msg['chat']['id'])
+        self.by: User = User.Get(self.msg['chat']['id'])
         self.chat_id: int = self.msg['chat']['id']
         self.forward_origin: ForwardOrigin = ForwardOrigin(self.msg['forward_origin']) if 'forward_origin' in self.msg else None
         self.replace_on_previous = False

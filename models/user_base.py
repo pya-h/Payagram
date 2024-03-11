@@ -1,7 +1,6 @@
 from decouple import config
 from db.interface import DatabaseInterface
 from datetime import datetime, date
-from apscheduler.schedulers.background import BackgroundScheduler
 from tools.mathematix import tz_today
 from enum import Enum
 from tools.mathematix import tz_today
@@ -22,6 +21,7 @@ class UserBase:
     _database = None
     Scheduler = None
     GarbageCollectionInterval = 60
+    ManualGarbageCollection = False
     Instances = {}  # active UserBases will cache into this; so there's no need to access database everytime
     # causing a slight enhancement on performance
     @staticmethod
@@ -63,22 +63,28 @@ class UserBase:
         self.Database().update(self)
         return self
 
-    def __init__(self, chat_id, language: str='fa') -> None:
+    def __init__(self, chat_id, language: str='fa', manual_garbage_collection: bool=False) -> None:
+        '''
+            @Param: manual_garbage_collect: if its false, this model will do garbage-collection by scheduler
+            if its true, its on the developer and it must be called on manualy (such as in Get method)
+            although its static, but it cant be changed on any user instance creation
+        '''
         self.is_admin: bool = False
         self.chat_id: int = chat_id
         self.last_interaction: datetime = tz_today()
         self.state: UserStates = None
         self.state_data: any = None
         self.language: str = language
-
+        UserBase.ManualGarbageCollection: bool = manual_garbage_collection
         UserBase.Instances[chat_id] = self  # this is for optimizing bot performance
         # saving recent users in the memory will reduce the delays for getting information, vs. using database everytime
-
-        if not UserBase.Scheduler:
-            # start garbage collector to optimize memory use
-            UserBase.Scheduler = BackgroundScheduler()
-            UserBase.Scheduler.add_job(UserBase.GarbageCollect, 'interval', seconds=UserBase.GarbageCollectionInterval*60)
-            UserBase.Scheduler.start()
+        if not UserBase.ManualGarbageCollection:
+            if not UserBase.Scheduler:
+                from apscheduler.schedulers.background import BackgroundScheduler
+                # start garbage collector to optimize memory use
+                UserBase.Scheduler = BackgroundScheduler()
+                UserBase.Scheduler.add_job(UserBase.GarbageCollect, 'interval', seconds=UserBase.GarbageCollectionInterval*60)
+                UserBase.Scheduler.start()
 
     def change_state(self, state: UserStates = UserStates.NONE, data: any = None):
         self.state = state
