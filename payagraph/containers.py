@@ -44,7 +44,7 @@ class ForwardOrigin:
 
 
 
-class TelegramMessage:
+class GenericMessage:
 
     def __init__(self, data: dict) -> None:
         self.msg: dict = data['message']
@@ -58,7 +58,7 @@ class TelegramMessage:
 
     @staticmethod
     def Text(target_chat_id: str, text: str = ''):
-        return TelegramMessage({"message": {
+        return GenericMessage({"message": {
             "text": text,
             "chat": {
                 "id": target_chat_id
@@ -66,7 +66,7 @@ class TelegramMessage:
         }})
 
 
-class TelegramCallbackQuery(TelegramMessage):
+class TelegramCallbackQuery(GenericMessage):
 
     def __init__(self, data: dict) -> None:
         super().__init__(data['callback_query'])
