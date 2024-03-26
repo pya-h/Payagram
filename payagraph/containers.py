@@ -71,6 +71,7 @@ class TelegramCallbackQuery(GenericMessage):
     def __init__(self, data: dict) -> None:
         super().__init__(data['callback_query'])
         self.data: str|dict = data['callback_query']['data']
+        self.callback_id = data['callback_query']['id']
         self.action: str = None
         self.value : str = self.data
         try:
