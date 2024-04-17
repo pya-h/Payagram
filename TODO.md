@@ -15,5 +15,6 @@
         5. sendVoice
         6. getChatMember
         7. sendChatAction [?]
-        8. etc
+        8. * Make Jobs async too.
+        9. etc
         
