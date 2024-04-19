@@ -6,6 +6,7 @@
         1. sendMessage
         2. editMessageText
         3. answerCallbackQuery
+        4. getUpdates (for longpolling bots)
 
     * Main methods that are required in any bot:
         1. sendPhoto
@@ -18,3 +19,8 @@
         8. * Make Jobs async too.
         9. etc
         
+# Chalenges
+    * This bot works well on local devices, remote servers but not on a cpanel host.
+    - The problem on cpanel, is in webhook mode, that its Job planner doesnt worn and it doesnt fire jobs at their due. [Think & R&D]
+    
+    * I want this to be more of a framework, or even a module. But for now its just a prepared python app that can be extended. [Needs R&D]
