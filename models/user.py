@@ -28,7 +28,7 @@ class User(UserBase):
         row = User.Database().get(chat_id)
         if row:
             '''load database and create User from that and'''
-            # return User(...)
+            return User(row[0], row[1]) 
         return User(chat_id=chat_id).save()
 
     # continue overriding methods or defining new ones if required...
