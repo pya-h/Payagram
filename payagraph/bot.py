@@ -1,4 +1,3 @@
-import requests
 from models.user import UserStates, User
 from typing import Callable, Dict, Union
 from tools.mathematix import minutes_to_timestamp
@@ -9,9 +8,17 @@ from tools.planner import Planner
 from tools.exceptions import *
 from flask import Flask, request, jsonify
 from payagraph.tools import ParallelJob
-from api.api_async import Request, Response
+from payagraph.api_async import Request, Response
+from enum import Enum
+import asyncio
 
 
+class BotMode(Enum):
+    WEBHOOK = 1
+    LONGPOLLING = 2
+    SERVERLESS_FUNCTION = 3
+
+    
 class TelegramBotCore:
     ''' Main and the very base of a telegram bot; with no helper method or handler; Can be used to create bots without using handler funcionalities; user state management, message and command check and all other stuffs are on developer. handle function has no use in this mode of bot development.'''
     def __init__(self, token: str, host_url: str) -> None:
@@ -62,6 +69,16 @@ class TelegramBotCore:
         res = await req.post()
         return res.value
 
+    async def get_updates(self, offset_id: int=None):
+        '''This method is used in longpolling bots.'''
+        url = f"{self.bot_api_url}/getUpdates"
+        if offset_id:
+            url += f"?offset={offset_id}"
+        req = Request(url)
+        res = await req.get()
+        return res.value
+
+
 
 class TelegramBot(TelegramBotCore):
     '''More Customizable and smart part of the TelegramBot; This object will allow to add handlers that are used by TelegramBotCore.handle function and
@@ -82,7 +99,9 @@ class TelegramBot(TelegramBotCore):
         self.clock = None
         ### Flask App configs ###
         self.app: Flask = Flask(__name__)
-
+        self.event_loop = None
+        self.polling_interval = 0
+        
     def main_keyboard(self, user_language: str = None) -> Keyboard:
         '''Get the keyboard that must be shown in most cases and on Start screen.'''
         if isinstance(self._main_keyboard, Keyboard):
@@ -101,7 +120,36 @@ class TelegramBot(TelegramBotCore):
             print(res)
             return jsonify({'status': 'ok', 'data': res})
 
-    def go(self, debug=True):
+    def start_polling(self, interval: float):
+        '''For longpoll bots'''
+        self.polling_interval = interval
+        self.event_loop = asyncio.get_event_loop()
+        self.event_loop.run_until_complete(self.handle_polling_updates())
+        
+    async def handle_polling_updates(self):
+        '''For longpoll bots'''
+        update_id = None
+        while True:
+            try:
+                updates = await self.get_updates(update_id)
+                print(updates)
+                if 'result' in updates:
+                    result = updates['result']
+                    for message in result:
+                        try:
+                            response = await self.handle(message)
+                            update_id = message['update_id'] + 1
+                        except Exception as ex:
+                            print(update_id, ex)
+                await asyncio.sleep(self.polling_interval)
+            except Exception as ex:
+                print(ex)
+                
+    def go(self, polling: bool=False, polling_interval: float=0.1, debug=True):
+        if polling:
+            self.start_polling(polling_interval)
+            return
+        
         self.app.run(debug=debug)
 
     def start_clock(self):
@@ -219,7 +267,7 @@ class TelegramBot(TelegramBotCore):
                 handler = self.command_handlers[message.text]
                 response, keyboard = handler(self, message)
             else:
-                if user.state != UserStates.NONE and user.state in self.state_handlers:
+                if user.state is not None and user.state in self.state_handlers:
                     handler = self.state_handlers[user.state]
                     response, keyboard = handler(self, message)
 

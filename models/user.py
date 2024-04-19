@@ -1,9 +1,11 @@
 from models.user_base import UserBase
 from tools.mathematix import tz_today
 from enum import Enum
-from models.user_base import UserStates as BaseUserStates
+from models.user_base import user_state_enum
 
-class UserStates(BaseUserStates):
+
+@user_state_enum()
+class UserStates(Enum):
     '''Custom states of the user can be defined here'''
 
 class User(UserBase):

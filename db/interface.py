@@ -1,7 +1,7 @@
 from db.interface_base import DatabaseInterfaceBase
 
 class DatabaseInterface(DatabaseInterfaceBase):
-    '''Sample database interface. write as you please'''
+    '''Implement your actual database here. This is the Actual one used in bot.'''
     _instance = None
 
     @staticmethod

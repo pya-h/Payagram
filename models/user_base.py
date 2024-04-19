@@ -4,6 +4,7 @@ from datetime import datetime, date
 from tools.mathematix import tz_today
 from enum import Enum
 from tools.mathematix import tz_today
+from payagraph.tools import extend_enum
 
 
 ADMIN_USERNAME = config('ADMIN_USERNAME')
@@ -12,8 +13,9 @@ ADMIN_PASSWORD = config('ADMIN_PASSWORD')
 class UserStates(Enum):
     '''This enum helps the developer to handle multistep bot actions and some other occasions where normal message and command handlers doesn't fullfil their objectives.'''
     NONE = 0
-    STATE_1 = 1
-    STATE_2 = 2
+
+def user_state_enum():
+    return extend_enum(UserStates)
 
 class UserBase:
     # states:
@@ -57,7 +59,7 @@ class UserBase:
 
     @staticmethod
     def Everybody():
-        return UserBase.Database().get_all()
+        return UserBase.Database().get_users_by_column()
 
     def save(self):
         self.Database().update(self)
