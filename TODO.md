@@ -22,5 +22,7 @@
 # Chalenges
     * This bot works well on local devices, remote servers but not on a cpanel host.
     - The problem on cpanel, is in webhook mode, that its Job planner doesnt worn and it doesnt fire jobs at their due. [Think & R&D]
+
+    * The passenger_wsgi application runs as expected but again, Planner doesnt work. I think it has something to do with being run as background process.
     
     * I want this to be more of a framework, or even a module. But for now its just a prepared python app that can be extended. [Needs R&D]
