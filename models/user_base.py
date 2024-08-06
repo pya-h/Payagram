@@ -4,7 +4,7 @@ from datetime import datetime, date
 from tools.mathematix import tz_today
 from enum import Enum
 from tools.mathematix import tz_today
-from payagraph.tools import extend_enum
+from payagram.tools import extend_enum
 
 
 ADMIN_USERNAME = config('ADMIN_USERNAME')
@@ -36,15 +36,7 @@ class UserBase:
     def GarbageCollect():
         '''This account schematic always caches some users, in order to enhance the performance while accessing model data. So instead of accessing and reading database every single time, it reads from ram if there is that special user,
         As the ram memory is limited, this cached memory needs to be cleaned if the user has not interacted more than a special amount of time[GarbageCollectionInterval/2]'''
-        now = tz_today()
-        garbage = []
-        for chat_id in UserBase.Instances:
-            if (now - UserBase.Instances[chat_id].last_interaction).total_seconds() / 60 >= UserBase.GarbageCollectionInterval / 2:
-                garbage.append(chat_id)
-        # because changing dict size in a loop on itself causes error,
-        # we first collect redundant chat_id s and then delete them from the memory
-        for g in garbage:
-            del UserBase.Instances[g]
+        pass
 
     @staticmethod
     def Get(chat_id):
@@ -54,7 +46,7 @@ class UserBase:
         row = UserBase.Database().get(chat_id)
         if row:
             '''load database and create UserBase from that and'''
-            # return UserBase(...)
+            return UserBase(chat_id=chat_id)
         return UserBase(chat_id=chat_id).save()
 
     @staticmethod
@@ -65,7 +57,7 @@ class UserBase:
         self.Database().update(self)
         return self
 
-    def __init__(self, chat_id, language: str='fa', manual_garbage_collection: bool=False) -> None:
+    def __init__(self, chat_id, language: str='en', manual_garbage_collection: bool=False) -> None:
         '''
             @Param: manual_garbage_collect: if its false, this model will do garbage-collection by scheduler
             if its true, its on the developer and it must be called on manualy (such as in Get method)

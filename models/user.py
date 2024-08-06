@@ -14,7 +14,20 @@ class User(UserBase):
     def __init__(self, chat_id, language: str = 'fa', manual_garbage_collection: bool = True) -> None:
         super().__init__(chat_id, language, manual_garbage_collection=manual_garbage_collection)
 
-    
+    @staticmethod
+    def GarbageCollect():
+        '''This account schematic always caches some users, in order to enhance the performance while accessing model data. So instead of accessing and reading database every single time, it reads from ram if there is that special user,
+        As the ram memory is limited, this cached memory needs to be cleaned if the user has not interacted more than a special amount of time[GarbageCollectionInterval/2]'''
+        now = tz_today()
+        garbage = []
+        for chat_id in UserBase.Instances:
+            if (now - UserBase.Instances[chat_id].last_interaction).total_seconds() / 60 >= UserBase.GarbageCollectionInterval / 2:
+                garbage.append(chat_id)
+        # because changing dict size in a loop on itself causes error,
+        # we first collect redundant chat_id s and then delete them from the memory
+        for g in garbage:
+            del UserBase.Instances[g]
+
     @staticmethod
     def Get(chat_id):
         if chat_id in User.Instances:

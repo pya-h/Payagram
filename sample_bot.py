@@ -1,8 +1,8 @@
 import logging
-from payagraph.bot import *
-from payagraph.containers import *
-from payagraph.keyboards import *
-from payagraph.tools import *
+from payagram.bot import *
+from payagram.containers import *
+from payagram.keyboards import *
+from payagram.tools import *
 from decouple import config
 from models.user import UserStates, Channel
 from tools import manuwriter
@@ -24,13 +24,13 @@ BOT_USERNAME = config('BOT_USERNAME')
 # Also you can write your texts by hard coding but it will be hard implementing multilanguage texts that way,
 text_resources = manuwriter.load_json('texts', 'resources')
 
-def some_message_handler(bot: TelegramBot, message: GenericMessage) -> Union[GenericMessage, Keyboard|InlineKeyboard]:
+async def some_message_handler(bot: TelegramBot, message: GenericMessage) -> Union[GenericMessage, Keyboard|InlineKeyboard]:
     '''TODO: Write your handler'''
 
-def some_state_handler(bot: TelegramBot, state: UserStates) -> Union[GenericMessage, Keyboard|InlineKeyboard]:
+async def some_state_handler(bot: TelegramBot, message: GenericMessage) -> Union[GenericMessage, Keyboard|InlineKeyboard]:
     '''TODO: Write your state handler. For each state of the user defined in UserStates enum, you must define a handler.'''
 
-def some_inline_query_handler(bot: TelegramBot, callback_query: TelegramCallbackQuery)-> Union[GenericMessage, Keyboard|InlineKeyboard]:
+async def some_inline_query_handler(bot: TelegramBot, callback_query: TelegramCallbackQuery)-> Union[GenericMessage, Keyboard|InlineKeyboard]:
     '''TODO: Write your inline query handler. handlers are categorized by action values of the query (inline keyboards must be grouped by special action values)
     You must write a handler for each single action value used in the bot.'''
 

@@ -1,4 +1,4 @@
-<h1>Payagraph</h1>
+<h1>payagram</h1>
 <hr/>
 <h3>Python 3 Module</h3>
 <hr />
